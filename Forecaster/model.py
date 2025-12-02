@@ -94,33 +94,28 @@ class QuadraFormer_star(nn.Module):
         self.pre_len = params["prediction_length"]  # --pred_len 96
         self.seq_len = params["window_size"]  # --seq_len 96
         self.k = 2  # --k 2
-        # 专家系统配置
         self.num_experts_list = [4]  # --num_experts_list [4,4,4]
         self.patch_size_list = [[16, 8, 4, 2]]
 
         self.d_model = 16  # --d_model 16
         self.d_ff = 64  # --d_ff 64
 
-        # 开关参数（直接使用参数解析的默认值）
         self.residual_connection = True  # --residual_connection 0
         self.batch_norm = False  # --batch_norm 0
         self.revin = True  # --revin 1
         self.drop = 0.1  # --drop 0.1
 
-        # RevIN初始化（使用参数默认配置）
         if self.revin:
             self.revin_layer = RevIN(
-                num_features=self.num_nodes,  # 原始ETT数据默认个特征（需根据实际数据调整）
-                affine=False,  # 默认无affine变换
+                num_features=self.num_nodes,  
+                affine=False,  
                 subtract_last=False
             )
 
-        # 输入层（根据默认参数配置）
         self.start_fc = nn.Linear(in_features=1, out_features=self.d_model)
 
-        # AMS模块初始化
         self.AMS_lists = nn.ModuleList()
-        self.device = torch.device('cuda:0')  # 默认使用gpu 0
+        self.device = torch.device('cuda:0')  
 
         for num in range(self.layer_nums):
             self.AMS_lists.append(
@@ -139,7 +134,6 @@ class QuadraFormer_star(nn.Module):
         )
 
     def forward(self, x):
-        # 初始化 balance_loss 为 tensor，并设置 device
         balance_loss = torch.tensor(0.0, device=x.device)
 
         # norm
@@ -151,12 +145,10 @@ class QuadraFormer_star(nn.Module):
         # print("out stats:", out.min().item(), out.max().item(), out.mean().item(), out.std().item())
         batch_size = x.shape[0]
 
-        # AMS 多层结构
         for layer in self.AMS_lists:
             out, aux_loss = layer(out)
             balance_loss = balance_loss + aux_loss.to(x.device)
 
-        # 输出 reshape
         out = out.permute(0, 2, 1, 3).reshape(batch_size, self.num_nodes, -1)
         res = out
         out = self.projections(out).transpose(2, 1)
@@ -415,31 +407,23 @@ from layers.QuadraLayer import SparseScaledDotProductAttention, ScaledDotProduct
 
 def _replace_sparse(module):
     for name, child in module.named_children():
-        # 找到稀疏注意力实例
         if isinstance(child, SparseScaledDotProductAttention):
-            # 用完全相同的超参构造一个 ScaledDotProductAttention
             dense = ScaledDotProductAttention(
                 d_model=child.d_model,
                 n_heads=child.n_heads,
-                attn_dropout=child.attn_dropout.p,   # 取原来的 dropout rate
+                attn_dropout=child.attn_dropout.p,  
                 res_attention=child.res_attention,
                 lsa=child.lsa
             )
-            # 替换到父模块里
             setattr(module, name, dense)
         else:
-            # 递归处理子模块
             _replace_sparse(child)
 
 
 class QuadraFormer_wos(QuadraFormer):
-    """
-    基于 QuadraFormer，去掉所有稀疏注意力（Sparse Attention），
-    用标准 ScaledDotProductAttention 替代。
-    """
+
     def __init__(self, **kwargs):
         super(QuadraFormer_wos, self).__init__(**kwargs)
-        # 替换稀疏注意力模块
         _replace_sparse(self)
 
 
@@ -460,34 +444,28 @@ class QuadraFormer_star_RE(nn.Module):
         self.pre_len = params["prediction_length"]  # --pred_len 96
         self.seq_len = params["window_size"]  # --seq_len 96
         self.k = 2  # --k 2
-        # 专家系统配置
         self.num_experts_list = [4]  # --num_experts_list [4,4,4]
-        self.patch_size_list = [[16, 8, 4, 2]] # reshape后的默认值 和layer相关
+        self.patch_size_list = [[16, 8, 4, 2]] 
 
-        # 维度参数
         self.d_model = 16  # --d_model 16
         self.d_ff = 64  # --d_ff 64
 
-        # 开关参数（直接使用参数解析的默认值）
         self.residual_connection = True  # --residual_connection 0
         self.batch_norm = False  # --batch_norm 0
         self.revin = True  # --revin 1
         self.drop = 0.1  # --drop 0.1
 
-        # RevIN初始化（使用参数默认配置）
         if self.revin:
             self.revin_layer = RevIN(
-                num_features=self.num_nodes,  # 原始ETT数据默认个特征（需根据实际数据调整）
-                affine=False,  # 默认无affine变换
+                num_features=self.num_nodes,  
+                affine=False,  
                 subtract_last=False
             )
 
-        # 输入层（根据默认参数配置）
         self.start_fc = nn.Linear(in_features=1, out_features=self.d_model)
 
-        # AMS模块初始化
         self.AMS_lists = nn.ModuleList()
-        self.device = torch.device('cuda:0')  # 默认使用gpu 0
+        self.device = torch.device('cuda:0')  
 
         for num in range(self.layer_nums):
             self.AMS_lists.append(
@@ -506,7 +484,6 @@ class QuadraFormer_star_RE(nn.Module):
         )
 
     def forward(self, x):
-        # 初始化 balance_loss 为 tensor，并设置 device
         balance_loss = torch.tensor(0.0, device=x.device)
 
         # norm
@@ -518,12 +495,10 @@ class QuadraFormer_star_RE(nn.Module):
         # print("out stats:", out.min().item(), out.max().item(), out.mean().item(), out.std().item())
         batch_size = x.shape[0]
 
-        # AMS 多层结构
         for layer in self.AMS_lists:
             out, aux_loss = layer(out)
             balance_loss = balance_loss + aux_loss.to(x.device)
 
-        # 输出 reshape
         out = out.permute(0, 2, 1, 3).reshape(batch_size, self.num_nodes, -1)
         res = out
         out = self.projections(out).transpose(2, 1)
@@ -538,3 +513,4 @@ class QuadraFormer_star_RE(nn.Module):
             out = self.revin_layer(out, 'denorm')
 
         return out, balance_loss
+
