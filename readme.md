@@ -98,10 +98,9 @@ config = {
 
 Supported workloads:
 
-- **SDSS Query Log**
-- **BusTracker / Tiramisu**
-- **BusTracker-sim**
-- **Alibaba Cluster Data**
+- **[SDSS Query Log](https://skyserver.sdss.org/log/en/traffic/)**
+- **[BusTracker Workload](https://github.com/linmagit/QueryBot5000)**
+- **[Alibaba Cluster Data](https://github.com/alibaba/clusterdata)**
 
 Preprocess with:
 
@@ -111,6 +110,16 @@ python Forecaster/data_process.py
 
 ---
 
+## 📚 Baseline References
+
+This repo compares against multiple forecasting methods. For reproducibility, we follow their official implementations:
+
+- **PathFormer** ([GitHub](https://github.com/decisionintelligence/pathformer))
+- **Sibyl**: Huang et al. *Sibyl: Forecasting Time-Evolving Query Workloads*, ACM SIGMOD 2024.
+- **DBAugur** ([GitHub](https://github.com/gaoyuanning/DBAugur))
+- **QueryBot5000** ([GitHub](https://github.com/linmagit/QueryBot5000))
+- **Vanilla Transformer**: Vaswani et al., NeurIPS 2017
+- **QuadraFormer** ([GitHub](https://github.com/hswhan/QuadraFormer))
 ## 📄 License
 
 MIT License
