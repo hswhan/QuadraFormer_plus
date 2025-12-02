@@ -118,20 +118,17 @@ class series_decomp_multi(nn.Module):
 
 
 class FourierLayer(nn.Module):
-    # 核心修改1：默认关闭外推（pred_len=0）
     def __init__(self, pred_len=0, k=None, low_freq=1, output_attention=False):
         super().__init__()
-        self.pred_len = pred_len  # 外推长度（0表示不外推）
+        self.pred_len = pred_len  
         self.k = k
         self.low_freq = low_freq
         self.output_attention = output_attention
 
     def forward(self, x):
         """x: (b, t, d)"""
-        # 记录输入特征维度（关键！）
         input_d = x.shape[2]
 
-        # 输入稳定化处理（保持不变）
         x_mean = x.mean(dim=1, keepdim=True)
         x_std = x.std(dim=1, keepdim=True) + 1e-8
         x_stable = (x - x_mean) / x_std
@@ -146,7 +143,6 @@ class FourierLayer(nn.Module):
         b, t, d = x_stable.shape
         x_freq = fft.rfft(x_stable, dim=1)
 
-        # 频率截断（增加特征维度检查）
         if t % 2 == 0:
             x_freq = x_freq[:, self.low_freq:-1] if self.low_freq < t // 2 else x_freq[:, :1]
         else:
@@ -155,25 +151,20 @@ class FourierLayer(nn.Module):
             x_freq = x_freq[:, :1]
         f = fft.rfftfreq(t)[self.low_freq:x_freq.shape[1] + self.low_freq]
 
-        # 频率选择（保持不变）
         x_freq, index_tuple = self.topk_freq(x_freq)
 
-        # 频率维度处理（保持不变）
         f = repeat(f, 'f -> b f d', b=x_freq.size(0), d=x_freq.size(2))
         f = f.to(x_freq.device)
         f = rearrange(f[index_tuple], 'b f d -> b f () d').to(x_freq.device)
 
-        # 反变换时确保特征维度与输入一致
         if self.pred_len == 0:
             x_time = fft.irfft(x_freq, n=t, dim=1)
-            # 核心修复：如果特征维度不匹配，用线性映射调整
             if x_time.shape[2] != input_d:
                 x_time = nn.Linear(x_time.shape[2], input_d, device=x_time.device)(x_time)
             x_time = x_time * x_std + x_mean
             return x_time, None
         else:
             extrapolated = self.extrapolate(x_freq, f, t)
-            # 核心修复：如果特征维度不匹配，用线性映射调整
             if extrapolated.shape[2] != input_d:
                 extrapolated = nn.Linear(extrapolated.shape[2], input_d, device=extrapolated.device)(extrapolated)
             extrapolated = extrapolated * x_std + x_mean
@@ -199,7 +190,6 @@ class FourierLayer(nn.Module):
         if x_freq.numel() == 0:
             raise ValueError("x_freq is empty (input to topk_freq)")
 
-        # 复数NaN处理
         real_part = x_freq.real
         imag_part = x_freq.imag
 
