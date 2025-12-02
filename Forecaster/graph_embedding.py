@@ -105,7 +105,6 @@ def main():
             embeddings.append(emb.cpu().numpy())
     embeddings = np.vstack(embeddings)
 
-    # 保存
     np.save(os.path.join(out_dir, "template_gnn_embeddings.npy"), embeddings)
     out_csv = pd.DataFrame({"template_id": ids})
     out_csv = pd.concat([out_csv, pd.DataFrame(embeddings)], axis=1)
@@ -115,3 +114,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
