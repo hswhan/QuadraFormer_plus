@@ -23,7 +23,6 @@ class RevIN(nn.Module):
         return x
 
     def _init_params(self):
-        # 参数形状 [C, 1, 1]，自动匹配设备
         self.affine_weight = nn.Parameter(torch.ones(self.num_features, 1, 1))
         self.affine_bias = nn.Parameter(torch.zeros(self.num_features, 1, 1))
 
@@ -36,7 +35,7 @@ class RevIN(nn.Module):
 
         var = x.var(dim=dim2reduce, keepdim=True, unbiased=False)
         self.stdev = torch.sqrt(var + self.eps).detach()
-        self.stdev = torch.clamp(self.stdev, min=1e-3)  # ✅ 不让除以0
+        self.stdev = torch.clamp(self.stdev, min=1e-3)  
 
     def _normalize(self, x):
         if not x.is_contiguous():
@@ -47,7 +46,7 @@ class RevIN(nn.Module):
         else:
             x = x - self.mean
 
-        x = x / (self.stdev + self.eps)  # ✅ 非 inplace，强制加 eps
+        x = x / (self.stdev + self.eps)  
 
         if self.affine:
             x = x * self.affine_weight
@@ -61,13 +60,14 @@ class RevIN(nn.Module):
 
         if self.affine:
             x = x - self.affine_bias
-            x = x / (self.affine_weight + self.eps)  # ✅ 改成 + eps
+            x = x / (self.affine_weight + self.eps)  
 
-        x = x * (self.stdev + self.eps)  # ✅ 改成 + eps
+        x = x * (self.stdev + self.eps)  
 
         if self.subtract_last:
             x = x + self.last
         else:
             x = x + self.mean
+
 
         return x
