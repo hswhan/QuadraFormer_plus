@@ -38,7 +38,7 @@ class Forecaster:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def process_sql_features(self, sql_feature_df, output_path):
-        sql_feature_df['id'] = pd.factorize(sql_feature_df['template_id'])[0] + 1  # 从1开始
+        sql_feature_df['id'] = pd.factorize(sql_feature_df['template_id'])[0] + 1  
         sql_feature_df['feature_vector'] = sql_feature_df['feature_vector'].apply(lambda x: ast.literal_eval(x))
         sql_feature_df['feature_vector'] = sql_feature_df['feature_vector'].apply(lambda x: np.array(x))
         feature_matrix = np.stack(sql_feature_df['feature_vector'].values)
@@ -142,7 +142,7 @@ class Forecaster:
         use_adaptive_tw = (self.config.get("data_type", "") == "hyper")
         if use_adaptive_tw:
             resource_dim = int(self.config.get("resource_dim", 6))
-            tw_alpha = float(self.config.get("gradnorm_alpha", 0.5))  # 0.25 / 0.5 / 0.75 都可以试
+            tw_alpha = float(self.config.get("gradnorm_alpha", 0.5))  # 0.25 / 0.5 / 0.75 
             tw_momentum = float(self.config.get("task_ema_momentum", 0.9))
             tw_eps = 1e-6
             ema_sql = None
@@ -311,7 +311,7 @@ class Forecaster:
                 all_outputs.append(outputs)
                 all_targets.append(batch_y)
         preds = torch.cat(all_outputs, dim=0).cpu()  # (N , H , D)
-        preds = torch.nan_to_num(preds, nan=0.0, posinf=1e6, neginf=-1e6)  # ✅ 防护
+        preds = torch.nan_to_num(preds, nan=0.0, posinf=1e6, neginf=-1e6)  
         targets = torch.cat(all_targets, dim=0).cpu()
         if self.config["QPS"] != "True":
             metrics = calculate_metrics(preds, targets,
@@ -426,3 +426,4 @@ if __name__ == '__main__':
     multiprocessing.freeze_support()
     forecaster = Forecaster(config)
     forecaster.run()
+
