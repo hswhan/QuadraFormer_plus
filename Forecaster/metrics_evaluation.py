@@ -177,7 +177,7 @@ def greedy_bipartite_matching(ground_truth, predicted, dict_df, column_labels, e
         template_id = int(gt_row[0])
         param_columns = dict_df[template_id][4]
         param_columns = list(map(int, ast.literal_eval(param_columns)))
-        # param_columns = [int(x) + 31 for x in ast.literal_eval(param_columns)]#新加了31列sql文本特征
+        # param_columns = [int(x) + 31 for x in ast.literal_eval(param_columns)]
         exact_match_index_new = [idx for idx in exact_match_index if idx in param_columns]
         range_match_index_new = [idx for idx in range_match_index if idx in param_columns]
         local_exact_match_index = [param_columns.index(idx) for idx in exact_match_index_new]
@@ -235,11 +235,10 @@ def _collect_indices_by_name(all_columns):
 
 def _remap_column_labels_to_feature_main(column_labels, feature_main_idx, all_columns):
     D_sql = len(feature_main_idx)
-    # 默认：between/float
     column_labels_sql = np.empty((D_sql, 4), dtype=object)
     for j in range(D_sql):
         column_labels_sql[j, 0] = j
-        column_labels_sql[j, 1] = "between"  # 默认回归用 between
+        column_labels_sql[j, 1] = "between"  
         column_labels_sql[j, 2] = "float"
         column_labels_sql[j, 3] = "nan"
     if isinstance(column_labels, np.ndarray):
@@ -651,3 +650,4 @@ def calculate_metrics(outputs, batch_y, config, dict_df, column_labels, scaler, 
         metrics["Resource Metrics"] = {"MSE": mse, "MAE": mae}
 
     return metrics
+
