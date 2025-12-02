@@ -208,7 +208,7 @@ class Inter_Patch_Attention(nn.Module):
 
         # Linear (+ split in multiple heads)
         q_s = self.W_Q(Q).view(bs, Q.shape[1], self.n_heads, self.d_k).transpose(1,
-                                                                                 2)  # q_s    : [bs x n_heads x q_len x d_k]  此处的q_len为patch_num
+                                                                                 2)  # q_s    : [bs x n_heads x q_len x d_k]  
         k_s = self.W_K(K).view(bs, K.shape[1], self.n_heads, self.d_k).permute(0, 2, 3,
                                                                                1)  # k_s    : [bs x n_heads x d_k x q_len] - transpose(1,2) + transpose(2,3)
         v_s = self.W_V(V).view(bs, V.shape[1], self.n_heads, self.d_v).transpose(1,
