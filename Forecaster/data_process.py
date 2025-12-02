@@ -255,7 +255,6 @@ def processsql(sql_statements):
         formatted_sql = sqlparse.format(str(parsed), keyword_case='lower', strip_comments=True, reindent=True)
         template_sql, param_mapping  = extract_template_and_params_with_sqlparse(formatted_sql)
         template_id = generate_template_id(template_sql)
-        # 保存模板字典（保证每个模板只存一条）
         if template_id not in template_dict:
             template_dict[template_id] = template_sql
         fv, param_types, string_dict = vectorize_params(param_mapping)
@@ -281,7 +280,7 @@ def processsql(sql_statements):
         if template_id not in template_lengths:
             template_lengths[template_id] = len(filtered_feature_vectors[idx])
             total_length += len(filtered_feature_vectors[idx])
-    concatenated_feature_vectors = np.zeros((len(filtered_sql_template_ids) , total_length) ) # 初始化一个包含所有特征的空向量
+    concatenated_feature_vectors = np.zeros((len(filtered_sql_template_ids) , total_length) ) 
     column_start_index = {}
     current_column = 0
     for template_id, length in template_lengths.items():
@@ -422,4 +421,5 @@ def main(data_set="SDSS", input_folder="data", output_folder="processed"):
 
 if __name__ == "__main__":
     main()
+
 
