@@ -20,10 +20,10 @@ def create_windows(data, config):
     y = np.array(y)  # (n_samples, pred_length, n_features)
 
     if y.ndim != X.ndim:
-        print(f"维度不一致警告: X.ndim={X.ndim}, y.ndim={y.ndim}，正在自动扩展y维度...")
+        print(f"Dim warning: X.ndim={X.ndim}, y.ndim={y.ndim}, extend y...")
         while y.ndim < X.ndim:
             y = np.expand_dims(y, axis=-1)
-            print(f"维度扩展: y新形状 {y.shape}")
+            print(f"Shape: y {y.shape}")
     return X, y
 
 
@@ -31,7 +31,7 @@ def create_nonoverlap_windows(data, config):
     X, y = [], []
     window_size = config['window_size']
     pred_length = config['prediction_length']
-    step = window_size  # 或 pred_length，根据具体需求调整
+    step = window_size  
 
     for i in range(0, len(data) - window_size - pred_length + 1, step):
         X.append(data.iloc[i:i + window_size, :].values)
@@ -40,10 +40,10 @@ def create_nonoverlap_windows(data, config):
     y = np.array(y)
 
     if y.ndim != X.ndim:
-        print(f"维度不一致警告: X.ndim={X.ndim}, y.ndim={y.ndim}，正在自动扩展y维度...")
+        print(f"Dim warning: X.ndim={X.ndim}, y.ndim={y.ndim}，extend y...")
         while y.ndim < X.ndim:
             y = np.expand_dims(y, axis=-1)
-            print(f"维度扩展: y新形状 {y.shape}")
+            print(f"Shape: y {y.shape}")
     return X, y
 
 
@@ -58,17 +58,13 @@ def load_data(config, scaler=None):
     print(f"Using data path: {absolute_data_path}")
     os.makedirs(absolute_data_path, exist_ok=True)
 
-    # —— QPS 分支 —— #
     if config.get("QPS", "False") == "True":
-        # 1) 读 timestamp 并聚合
         timestamps_file = os.path.join(original_data_path, "timestamps.csv")
         df_ts = pd.read_csv(timestamps_file)
         df_ts['timestamp'] = pd.to_datetime(df_ts['timestamp'], unit='s')
-        qps_freq = config.get("QPS_FREQ", "min").lower()  # 's' 或 'min'
+        qps_freq = config.get("QPS_FREQ", "min").lower() 
         df_ts['timestamp'] = df_ts['timestamp'].dt.floor(qps_freq)
         qps_series = df_ts.groupby('timestamp').size().rename('qps').reset_index()
-
-        # 2) 全量滑窗生成训练+测试集合
         vals = qps_series['qps'].values.astype(np.float32)
         W, H = config['window_size'], config['prediction_length']
         X_all, y_all = [], []
@@ -77,14 +73,11 @@ def load_data(config, scaler=None):
             y_all.append(vals[i + W:i + W + H])
         X_all = np.array(X_all)[:, :, None]  # (N_all, W, 1)
         y_all = np.array(y_all)[:, :, None]  # (N_all, H, 1)
-
-        # 3) 训练/测试 80/20 划分
         N_all = len(X_all)
         split = int(0.8 * N_all)
         X_train, y_train = X_all[:split], y_all[:split]
         X_test, y_test = X_all[split:], y_all[split:]
 
-        # 4) 预测集（固定窗口数）
         fps = 60 if config.get("QPS_FREQ", "min").lower() in ('min', 't') else 3600
         interval = int(config.get('interval', 0))  # 小时
         vals = qps_series['qps'].values.astype(np.float32)
@@ -99,7 +92,6 @@ def load_data(config, scaler=None):
             X_forc[n, :, 0] = padded[start: start + W]
             y_forc[n, :, 0] = padded[start + W: start + W + H]
 
-        # 5) 标准化
         scaler = StandardScaler().fit(X_train.reshape(-1, 1))
         def scale(arr):
             s0, s1, s2 = arr.shape
@@ -109,12 +101,10 @@ def load_data(config, scaler=None):
         X_train = scale(X_train); X_test = scale(X_test); X_forc = scale(X_forc)
         y_train = scale(y_train); y_test = scale(y_test); y_forc = scale(y_forc)
 
-        # === ALL_COLUMNS：定义并保存列名（QPS 只有 'qps'） ===
         all_columns = ["qps"]
         np.save(os.path.join(absolute_data_path, "columns.npy"), np.array(all_columns, dtype=object))
         config['all_columns'] = all_columns
 
-        # 6) 转 TensorDataset 并返回
         train_ds = TensorDataset(torch.tensor(X_train, dtype=torch.float32),
                                  torch.tensor(y_train, dtype=torch.float32))
         test_ds = TensorDataset(torch.tensor(X_test, dtype=torch.float32),
@@ -134,7 +124,6 @@ def load_data(config, scaler=None):
             test_max, test_min, forecast_max, forecast_min
         )
 
-    # ===== 非 QPS 分支 =====
     if config["data_type"] == 'resource':
         required_files = ['X_train.npy', 'y_train.npy', 'X_test.npy', 'y_test.npy']
     else:
@@ -163,7 +152,6 @@ def load_data(config, scaler=None):
             X_forecast = np.load(file_paths[f"X_{config['interval']}h.npy"])
             y_forecast = np.load(file_paths[f"y_{config['interval']}h.npy"])
         else:
-            # 若不需要 forecast，构造占位
             X_forecast = X_test[:1].copy()
             y_forecast = y_test[:1].copy()
 
@@ -194,7 +182,6 @@ def load_data(config, scaler=None):
         config['input_dim'] = X_train.shape[-1]
         config['output_dim'] = y_train.shape[-1]
 
-        # === ALL_COLUMNS：读取 columns.npy（若缺失则兜底） ===
         columns_file = os.path.join(absolute_data_path, "columns.npy")
         if os.path.exists(columns_file):
             all_columns = np.load(columns_file, allow_pickle=True).tolist()
@@ -215,7 +202,6 @@ def load_data(config, scaler=None):
             forecast_min
         )
 
-    # ===== 首次从 CSV 预处理 =====
     print("Preprocessing data from CSV files...")
     timestamps_file = os.path.join(original_data_path, "timestamps.csv")
     sql_feature_file = os.path.join(original_data_path, "sql_features_modified.csv")
@@ -235,7 +221,6 @@ def load_data(config, scaler=None):
         print(f"File not found: {e.filename}")
         raise
 
-    # ========= 时间拆列 =========
     timestamps_df['timestamp'] = pd.to_datetime(timestamps_df['timestamp'], unit='s')
     timestamps_df['YY']   = timestamps_df['timestamp'].dt.year
     timestamps_df['MM']   = timestamps_df['timestamp'].dt.month
@@ -245,7 +230,6 @@ def load_data(config, scaler=None):
     timestamps_df['SEC']  = timestamps_df['timestamp'].dt.second
     timestamps_df = timestamps_df.drop(columns=['timestamp'])
 
-    # ========= 嵌入加载函数（保持你之前的实现）=========
     def load_template_embeddings(original_data_path: str,
                                  dict_file: str,
                                  variant: str,
@@ -333,16 +317,12 @@ def load_data(config, scaler=None):
             other_result_df = pd.concat([other_data_df, other_diff], axis=1)
             dfs.append(other_result_df)
 
-        # 嵌入（放在 template_id 后面）
         embed_variant  = str(config.get("embed_variant", "gnn")).lower()
         embed_override = str(config.get("embed_file_override", "")).strip()
         embed_df = None
 
         if existing_embed_cols:
-            # 如果原数据里就带 embed_*，这一步不要重复加；同时它们也不会进 SQL 参数（上面已经剔除）
             print(f"[Data] Detected existing embeddings in csv: {len(existing_embed_cols)} dims. Skip re-adding.")
-            # 如果你想把已有 embed_* 放到 id 后面而不是 SQL 后面，可以在这里把它们从 sql_feature_df 里单独摘出来拼到 merged_parts 第二位。
-            # 例如：
             # embed_df = sql_feature_df[existing_embed_cols].copy()
         else:
             template2embed, emb_dim = load_template_embeddings(
@@ -362,7 +342,6 @@ def load_data(config, scaler=None):
             else:
                 print("[Data] No template embeddings loaded; continue without embed_*.")
 
-        # 列顺序：template_id → embed_* → timestamps(main+val) → SQL/Resource
         merged_parts = [template_id_series.rename('template_id').to_frame()]
         if embed_df is not None:
             merged_parts.append(embed_df)
@@ -375,37 +354,26 @@ def load_data(config, scaler=None):
         embed_cols_in_merged = [c for c in merged_df.columns if str(c).startswith("embed_")]
         print(f"[Data] embed dims in merged_df: {len(embed_cols_in_merged)}")
 
-    # ========= 合并特征（alibaba）=========
     else:
         col_name = other_data_df.columns[0]
         other_data_df[col_name] = other_data_df[col_name].str.extract(r'm_(\d+)').astype(int)
         merged_df = other_data_df
 
-
-
-    # === ALL_COLUMNS：保存列名并写回 config（关键！） ===
     all_columns = merged_df.columns.tolist()
     np.save(os.path.join(absolute_data_path, "columns.npy"), np.array(all_columns, dtype=object))
     config['all_columns'] = all_columns
-    # 可选：核对资源列
     resource_dim = int(config.get('resource_dim', 6))
     print("Tail columns (should be resource metrics):", all_columns[-resource_dim:])
 
-    # 切窗
     split_idx = int(0.8 * len(merged_df))
     train_df = merged_df[:split_idx]
-    test_df = merged_df[split_idx - config['window_size'] - config['prediction_length'] + 1:]  # 补足边缘窗口
+    test_df = merged_df[split_idx - config['window_size'] - config['prediction_length'] + 1:] 
     X_train, y_train = create_windows(train_df, config)
     X_test, y_test = create_nonoverlap_windows(test_df, config)
     config['input_dim'] = X_train.shape[-1]
     config['output_dim'] = y_train.shape[-1]
 
-    # ====== 替换你原来的切片块（从定义 time_intervals 开始直到保存 forecast_X/forecast_y 之前）======
-
-    # 预测窗口候选
     time_intervals = [1, 6, 12, 24, 48]
-
-    # 兼容不同数据集时间列，统一得到 ts_series（与 merged_df 对齐）
     if config['data_set'] != "alibaba":
         ts_series = pd.to_datetime(
             merged_df[['YY', 'MM', 'DD', 'HOUR', 'MIN', 'SEC']].rename(
@@ -422,12 +390,9 @@ def load_data(config, scaler=None):
             ),
             errors='coerce'
         )
-
-    # end_time 建议用 ts_series 的最大时间，更稳妥
     end_time = ts_series.max()
 
     forecast_X, forecast_y = None, None
-    # 配置优先，否则默认 48h
     interval_cfg_raw = config.get('interval', None)
     try:
         interval_cfg = int(interval_cfg_raw) if interval_cfg_raw not in (None, 'None') else 48
@@ -436,34 +401,27 @@ def load_data(config, scaler=None):
 
     for interval in time_intervals:
         start_time = end_time - timedelta(hours=interval)
-        # 右闭左开：避免不同 interval 之间重复覆盖 end_time 这一刻
         mask = (ts_series > start_time) & (ts_series <= end_time)
         filtered_data = merged_df.loc[mask].reset_index(drop=True)
 
         window_size = int(config['window_size'])
         num_rows = int(filtered_data.shape[0])
         if num_rows == 0:
-            # 该 interval 没数据，跳过
             continue
 
-        # 计算能够组成的完整非重叠窗口数
         num_complete_windows = num_rows // window_size
 
         if num_complete_windows == 0:
-            # 不足一整窗：从末尾“补齐到一窗”（重复最后一行），确保至少有一个窗口用于预测
             pad_n = window_size - num_rows
             tail = filtered_data.tail(1).copy()
             filtered_data = pd.concat([filtered_data, pd.concat([tail] * pad_n, ignore_index=True)], ignore_index=True)
             num_complete_windows = 1
         else:
-            # 关键修复：**取末端**的完整窗口，让窗口与 end_time 对齐
             keep_len = num_complete_windows * window_size
             filtered_data = filtered_data.iloc[-keep_len:].reset_index(drop=True)
 
-        # 生成非重叠窗口（要求你的 create_nonoverlap_windows 按行顺序切分）
         X_interval, Y_interval = create_nonoverlap_windows(filtered_data, config)
 
-        # 保存缓存（口径与原来一致）
         np.save(os.path.join(absolute_data_path, f'X_{interval}h.npy'), X_interval)
         np.save(os.path.join(absolute_data_path, f'y_{interval}h.npy'), Y_interval)
         if interval == interval_cfg:
@@ -524,3 +482,4 @@ def load_data(config, scaler=None):
         forecast_max,
         forecast_min
     )
+
