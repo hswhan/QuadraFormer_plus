@@ -1,0 +1,382 @@
+Num,template_id,template_sql,param_types,column_range,string_dict,range_predicates,range_type,removed_columns
+0,832ad5d0,"select TOP c1 p.objid,
+           p.run,
+           p.rerun,
+           p.camcol,
+           p.field,
+           p.obj,
+           p.type,
+           p.ra,
+           p.dec,
+           p.u,
+           p.g,
+           p.r,
+           p.i,
+           p.z,
+           p.Err_u,
+           p.Err_g,
+           p.Err_r,
+           p.Err_i,
+           p.Err_z
+from fGetNearbyObjEq(c2, c3, c4) n,
+     PhotoPrimary p
+where n.objID=p.objID","{""c1"": ""int"", ""c2"": ""float"", ""c3"": ""float"", ""c4"": ""int""}","[1, 2, 3, 4]",{},[],[],[]
+1,9ebf1c9b,"select ra,dec,psfMag_u,
+              psfMag_g,
+              psfMag_r,
+              psfMag_i,
+              psfMag_z,
+              petroRc1_r,
+              probPSF,
+              psfMagErr_u,
+              psfMagErr_g,
+              psfMagErr_r,
+              psfMagErr_i,
+              psfMagErr_z,
+              p.objid
+from (PhotoTag p
+      inner join fGetObjFromRectEq(c2, c3, c4, c5) r on p.objid=r.objid)","{""c1"": ""int"", ""c2"": ""float"", ""c3"": ""int"", ""c4"": ""int"", ""c5"": ""float""}","[5, 6, 7, 8, 9]",{},[],[],[]
+2,33a7fe87,"select r.run,
+       r.rerun,
+       r.camcol,
+       r.field,
+       f.fieldId,
+       r.stripe,
+       r.strip,
+       r.ra,
+       r.dec,
+       r.raMin,
+       r.raMax,
+       r.decMin,
+       r.decMax,
+       r.mu,
+       r.nu,
+       r.incl,
+       r.node,
+       r.a,
+       r.b,
+       r.c,
+       r.d,
+       r.e,
+       r.f,
+       f.quality,
+       f.a_u,
+       f.b_u,
+       f.c_u,
+       f.d_u,
+       f.e_u,
+       f.f_u,
+       f.a_g,
+       f.b_g,
+       f.c_g,
+       f.d_g,
+       f.e_g,
+       f.f_g,
+       f.a_r,
+       f.b_r,
+       f.c_r,
+       f.d_r,
+       f.e_r,
+       f.f_r,
+       f.a_i,
+       f.b_i,
+       f.c_i,
+       f.d_i,
+       f.e_i,
+       f.f_i,
+       f.a_z,
+       f.b_z,
+       f.c_z,
+       f.d_z,
+       f.e_z,
+       f.f_z,
+       dbo.fGetUrlFitsCFrame(f.fieldId, c1) as u_url,
+       dbo.fGetUrlFitsCFrame(f.fieldId, c2) as g_url,
+       dbo.fGetUrlFitsCFrame(f.fieldId, c3) as r_url,
+       dbo.fGetUrlFitsCFrame(f.fieldId, c4) as i_url,
+       dbo.fGetUrlFitsCFrame(f.fieldId, c5) as z_url
+from dbo.fGetNearbyFrameEq(c6, c7, c8, c9) n,
+     Frame r,
+     Field f
+where f.fieldId=r.fieldId
+  and r.fieldId=n.fieldId
+  and r.zoom=c10","{""c1"": ""string"", ""c2"": ""string"", ""c3"": ""string"", ""c4"": ""string"", ""c5"": ""string"", ""c6"": ""int"", ""c7"": ""int"", ""c8"": ""float"", ""c9"": ""int"", ""c10"": ""int""}","[10, 11, 12, 13, 14, 15, 16, 17, 18, 19]","{""'u'"": 1, ""'g'"": 2, ""'r'"": 3, ""'i'"": 4, ""'z'"": 5}",[],[],[]
+3,0cb83fc1,"select top c1 c2 + cast(p.objId as varchar(c3)) + c4 + cast(p.objId as varchar(c5)) + c6 as objID,
+           p.run,
+           p.rerun,
+           p.camcol,
+           p.field,
+           p.obj,
+           p.type,
+           p.ra,
+           p.dec,
+           p.u,
+           p.g,
+           p.r,
+           p.i,
+           p.z,
+           p.Err_u,
+           p.Err_g,
+           p.Err_r,
+           p.Err_i,
+           p.Err_z
+from fGetNearbyObjEq(c7, c8, c9) n,
+     PhotoPrimary p
+where n.objID=p.objID","{""c1"": ""int"", ""c2"": ""string"", ""c3"": ""int"", ""c4"": ""string"", ""c5"": ""int"", ""c6"": ""string"", ""c7"": ""int"", ""c8"": ""float"", ""c9"": ""float""}","[20, 21, 22, 23, 24, 25, 26, 27, 28]","{""'<a target=INFO href=http://cas.sdss.org/dr7/en/tools/explore/obj.asp?id='"": 1, ""'>'"": 2, ""'</a>'"": 3}",[],[],[]
+4,b470c3d0,"select name,
+       type
+from DBObjects
+where type=c1
+  and access=c2
+  and name not in (c3,
+                   c4)
+order by name","{""c1"": ""string"", ""c2"": ""string"", ""c3"": ""string"", ""c4"": ""string""}","[29, 30, 31, 32]","{""'U'"": 1, ""'LoadEvents'"": 2, ""'QueryResults'"": 3}","[31, 32]",[],[]
+5,43b5caf2,"select c1 + cast(p.objId as varchar(c2)) + c3 + cast(p.objId as varchar(c4)) + c5 as objID,
+       p.run,
+       p.rerun,
+       p.camcol,
+       p.field,
+       p.obj,
+       p.type,
+       p.ra,
+       p.dec,
+       p.u,
+       p.g,
+       p.r,
+       p.i,
+       p.z,
+       p.Err_u,
+       p.Err_g,
+       p.Err_r,
+       p.Err_i,
+       p.Err_z
+from fGetNearbyObjEq(c6, c7, c8) n,
+     PhotoPrimary p
+where n.objID=p.objID","{""c1"": ""string"", ""c2"": ""int"", ""c3"": ""string"", ""c4"": ""int"", ""c5"": ""string"", ""c6"": ""int"", ""c7"": ""float"", ""c8"": ""float""}","[33, 34, 35, 36, 37, 38, 39, 40]","{""'<a target=INFO href=../../../en/tools/explore/obj.aspx?id='"": 1, ""'>'"": 2, ""'</a>'"": 3}",[],[],[]
+6,a465a306,"select top c1 p.objID,
+           p.run,
+           p.rerun,
+           p.camcol,
+           p.field,
+           p.obj,
+           p.type,
+           p.ra,
+           p.dec,
+           p.u,
+           p.g,
+           p.r,
+           p.i,
+           p.z,
+           p.Err_u,
+           p.Err_g,
+           p.Err_r,
+           p.Err_i,
+           p.Err_z
+from fGetNearbyObjEq(c2, c3, c4) n,
+     PhotoPrimary p
+where n.objID=p.objID","{""c1"": ""int"", ""c2"": ""int"", ""c3"": ""float"", ""c4"": ""float""}","[41, 42, 43, 44]",{},[],[],[]
+7,19afe0f3,"select top c1 c2 + cast(p.objId as varchar(c3)) + c4 + cast(p.objId as varchar(c5)) + c6 as objID,
+           p.run,
+           p.rerun,
+           p.camcol,
+           p.field,
+           p.obj,
+           p.type,
+           p.ra,
+           p.dec,
+           p.u,
+           p.g,
+           p.r,
+           p.i,
+           p.z,
+           p.Err_u,
+           p.Err_g,
+           p.Err_r,
+           p.Err_i,
+           p.Err_z
+from fGetNearbyObjEq(c7, c8, c9) n
+join PhotoPrimary p on n.objID=p.objID","{""c1"": ""int"", ""c2"": ""string"", ""c3"": ""int"", ""c4"": ""string"", ""c5"": ""int"", ""c6"": ""string"", ""c7"": ""int"", ""c8"": ""float"", ""c9"": ""float""}","[45, 46, 47, 48, 49, 50, 51, 52, 53]","{""'<a target=INFO href=http://skyserver.sdss.org/dr9/en/tools/explore/obj.asp?id='"": 1, ""'>'"": 2, ""'</a>'"": 3}",[],[],[]
+8,80cebd15,"select c1 + cast(p.apstar_id as varchar(c2)) + c3 + cast(p.apstar_id as varchar(c4)) + c5 as apstar_id,
+       p.apogee_id,
+       p.ra,
+       p.dec,
+       p.glon,
+       p.glat,
+       p.vhelio_avg,
+       p.vscatter,
+       a.teff,
+       a.logg,
+       a.metals
+from apogeeStar p
+join fGetNearbyApogeeStarEq(c6, c7, c8) n on p.apstar_id=n.apstar_id
+join aspcapStar a on a.apstar_id = p.apstar_id","{""c1"": ""string"", ""c2"": ""int"", ""c3"": ""string"", ""c4"": ""int"", ""c5"": ""string"", ""c6"": ""int"", ""c7"": ""float"", ""c8"": ""float""}","[54, 55, 56, 57, 58, 59, 60, 61]","{""'<a target=INFO href=../../../en/tools/explore/summary.aspx?apid='"": 1, ""'>'"": 2, ""'</a>'"": 3}",[],[],[]
+9,f4773be4,"select name,
+       type
+from DBObjects
+where type=c1
+  and name not in (c2,
+                   c3)
+order by name","{""c1"": ""string"", ""c2"": ""string"", ""c3"": ""string""}","[62, 63, 64]","{""'V'"": 1, ""'LoadEvents'"": 2, ""'QueryResults'"": 3}","[63, 64]",[],[]
+10,b2739fbf,"select description
+from DBObjects
+where name=c1","{""c1"": ""string""}",[65],"{""'Photoz'"": 1}",[],[],[]
+11,0a52d6b7,"select top c1 p.objid,
+           p.ra,
+           p.dec,
+           dbo.fPhotoTypeN(p.type) as type,
+           u,
+           g,
+           r,
+           i,
+           z,
+           Err_u,
+           Err_g,
+           Err_r,
+           Err_i,
+           Err_z,
+           psfMag_u,
+           psfMagErr_u,
+           psfMag_g,
+           psfMagErr_g,
+           psfMag_r,
+           psfMagErr_r,
+           psfMag_i,
+           psfMagErr_i,
+           psfMag_z,
+           psfMagErr_z
+from PhotoPrimary p,
+     dbo.fGetNearbyObjEq(c2, c3, c4) n
+where p.objId=n.objId","{""c1"": ""int"", ""c2"": ""float"", ""c3"": ""float"", ""c4"": ""int""}","[66, 67, 68, 69]",{},[],[],[]
+12,1cf05be9,"select name,
+       ucd
+from dbcolumns
+where tablename = c1
+  and (name like c2
+       or name like c3
+       or name like c4
+       or name like c5
+       or name like c6
+       or name like c7
+       or name like c8
+       or name like c9
+       or name like c10
+       or name like c11
+       or name like c12
+       or name like c13
+       or name like c14
+       or name like c15
+       or name like c16
+       or name like c17
+       or name like c18
+       or name like c19
+       or name like c20
+       or name like c21
+       or name like c22
+       or name like c23
+       or name like c24
+       or name like c25)","{""c1"": ""string"", ""c2"": ""string"", ""c3"": ""string"", ""c4"": ""string"", ""c5"": ""string"", ""c6"": ""string"", ""c7"": ""string"", ""c8"": ""string"", ""c9"": ""string"", ""c10"": ""string"", ""c11"": ""string"", ""c12"": ""string"", ""c13"": ""string"", ""c14"": ""string"", ""c15"": ""string"", ""c16"": ""string"", ""c17"": ""string"", ""c18"": ""string"", ""c19"": ""string"", ""c20"": ""string"", ""c21"": ""string"", ""c22"": ""string"", ""c23"": ""string"", ""c24"": ""string"", ""c25"": ""string""}","[70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94]","{""'photoobjall'"": 1, ""'OBJID'"": 2, ""'RA'"": 3, ""'DEC'"": 4, ""'TYPE'"": 5, ""'U'"": 6, ""'G'"": 7, ""'R'"": 8, ""'I'"": 9, ""'Z'"": 10, ""'ERR_U'"": 11, ""'ERR_G'"": 12, ""'ERR_R'"": 13, ""'ERR_I'"": 14, ""'ERR_Z'"": 15, ""'PSFMAG_U'"": 16, ""'PSFMAGERR_U'"": 17, ""'PSFMAG_G'"": 18, ""'PSFMAGERR_G'"": 19, ""'PSFMAG_R'"": 20, ""'PSFMAGERR_R'"": 21, ""'PSFMAG_I'"": 22, ""'PSFMAGERR_I'"": 23, ""'PSFMAG_Z'"": 24, ""'PSFMAGERR_Z'"": 25}","[71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94]","['[like: 71]', '[like: 72]', '[like: 73]', '[like: 74]', '[like: 75]', '[like: 76]', '[like: 77]', '[like: 78]', '[like: 79]', '[like: 80]', '[like: 81]', '[like: 82]', '[like: 83]', '[like: 84]', '[like: 85]', '[like: 86]', '[like: 87]', '[like: 88]', '[like: 89]', '[like: 90]', '[like: 91]', '[like: 92]', '[like: 93]', '[like: 94]']",[]
+13,fd02ca00,"select name,
+       type
+from DBObjects
+where name like c1
+  or name like c2
+order by name","{""c1"": ""string"", ""c2"": ""string""}","[95, 96]","{""'%Constants%'"": 1, ""'%Defs%'"": 2}","[95, 96]","['[like: 95]', '[like: 96]']",[]
+14,6309d070,"select [indexMapID],
+       [code],
+       [type],
+       [tableName],
+       [fieldList],
+       [foreignKey]
+from IndexMap
+where tableName=c1
+order by [indexMapId]","{""c1"": ""string""}",[97],"{""'galspecinfo'"": 1}",[],[],[]
+15,e6ed8ccf,"select s.z,
+       p.petroRad_z
+from photoObj p
+join specObj s on s.bestObjID = p.objID
+where s.bestObjID = c1","{""c1"": ""int""}",[98],{},[],[],[]
+16,0c7206b2,"select z,
+       ra, dec, bestObjID
+from specObj
+where class = c1
+  and ra between c2 and c3
+  and dec between c4 and c5
+  and z between c6 and c7","{""c1"": ""string"", ""c2"": ""float"", ""c3"": ""float"", ""c4"": ""float"", ""c5"": ""float"", ""c6"": ""string"", ""c7"": ""string""}","[99, 100, 101, 102, 103, 104, 105]","{""'galaxy'"": 1, ""nan"": 2}","[100, 101, 102, 103, 104, 105]","['[between: 100, 101]', '[between: 102, 103]', '[between: 104, 105]']",[]
+17,a8fb8d16,"select distinct p.ra,
+                p.dec,
+                p.objid,
+                p.run,
+                p.rerun,
+                p.camcol,
+                p.field,
+                s.z,
+                s.plate,
+                s.mjd,
+                s.fiberID,
+                s.specobjid,
+                s.runc1d,
+                s.instrument
+from PhotoObjAll as p
+join SpecObjAll s on p.objID = s.bestObjID
+where ((p.ra between c2 and c3)
+       and (p.dec between c4 and c5))","{""c1"": ""int"", ""c2"": ""int"", ""c3"": ""int"", ""c4"": ""int"", ""c5"": ""int""}","[106, 107, 108, 109, 110]",{},"[107, 108, 109, 110]","['[between: 107, 108]', '[between: 109, 110]']",[]
+18,4c2da2e3,"select dbo.fGetNearestSpecObjIdAllEq(c1, c2, c3) as specObjID","{""c1"": ""float"", ""c2"": ""float"", ""c3"": ""float""}","[111, 112, 113]",{},[],[],[]
+19,1d5f5b9f,"select distinct p.ra,
+                p.dec,
+                p.clean,
+                p.u,
+                p.g,
+                p.r,
+                p.i,
+                p.z
+from PhotoObjAll as p
+where ((p.ra between c1 and c2)
+       and (p.dec between c3 and c4))","{""c1"": ""float"", ""c2"": ""float"", ""c3"": ""float"", ""c4"": ""float""}","[114, 115, 116, 117]",{},"[114, 115, 116, 117]","['[between: 114, 115]', '[between: 116, 117]']",[]
+20,35240dfd,"select P.objid,
+       P.ra,
+       P.dec,
+       P.petroMag_r,
+       P.petroMagErr_r,
+       P.deVRad_r,
+       P.petroRad_r,
+       P.deVPhi_r,
+       P.deVAB_r,
+       P.rowc_r,
+       P.colc_r,
+       P.run,
+       P.rerun,
+       P.camcol,
+       P.field
+from PhotoObjAll P
+where P.objid = c1","{""c1"": ""int""}",[118],{},[],[],[]
+21,187f72ee,"select ra,dec,dered_u,
+              dered_g,
+              dered_r,
+              dered_i,
+              dered_z,
+              Err_u,
+              Err_g,
+              Err_r,
+              Err_i,
+              Err_z,
+              flags_r,
+              run
+from Galaxy
+where ra between c1 and c2
+  and dec between c3 and c4","{""c1"": ""float"", ""c2"": ""float"", ""c3"": ""float"", ""c4"": ""float""}","[119, 120, 121, 122]",{},"[119, 120, 121, 122]","['[between: 119, 120]', '[between: 121, 122]']",[]
+22,129f0cd2,"select p.objid,
+       p.ra,
+       p.dec,
+       p.r,
+       s.specobjid,
+       s.z,
+       dbo.fSpecZWarningN(s.zWarning) as warning,
+       s.plate,
+       s.mjd,
+       s.fiberid
+from PhotoObj as p
+join SpecObj as s on s.bestobjid = p.objid
+where p.ra < c1
+  and p.ra > c2
+  and p.dec < c3
+  and p.dec > c4","{""c1"": ""float"", ""c2"": ""float"", ""c3"": ""float"", ""c4"": ""float""}","[123, 124, 125, 126]",{},"[123, 124, 125, 126]","['[<: 123]', '[>: 124]', '[<: 125]', '[>: 126]']",[]
