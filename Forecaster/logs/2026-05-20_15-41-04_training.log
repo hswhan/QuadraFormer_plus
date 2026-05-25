@@ -1,0 +1,492 @@
+2026-05-20 15:41:04,874 - INFO - Start...
+2026-05-20 15:41:28,042 - INFO - Initial QuadraFormer_star
+©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥
+\u2022 Input Dim:          303
+\u2022 Outout Dim:         303
+\u2022 Window Size£º        16
+\u2022 Pre Length£º       16
+2026-05-20 15:41:28,044 - INFO - Build New Model:
+QuadraFormer_star(
+  (revin_layer): RevIN()
+  (start_fc): Linear(in_features=1, out_features=16, bias=True)
+  (AMS_lists): ModuleList(
+    (0): AMS_new(
+      (start_linear): Linear(in_features=303, out_features=1, bias=True)
+      (seasonality_model): FourierLayer()
+      (trend_model): series_decomp_multi(
+        (layer): Linear(in_features=1, out_features=3, bias=True)
+      )
+      (experts): ModuleList(
+        (0): QuadraLayer(
+          (embedding_generator_shared): Sequential(
+            (0): Linear(in_features=16, out_features=16, bias=True)
+          )
+          (intra_patch_attention): Intra_Patch_Attention(
+            (custom_linear): CustomLinear()
+          )
+          (weights_generator_distinct): WeightGenerator(
+            (generator): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): Tanh()
+              (2): Linear(in_features=64, out_features=64, bias=True)
+              (3): Tanh()
+              (4): Linear(in_features=64, out_features=100, bias=True)
+            )
+            (P): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 16x10 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 16x10 (cuda:0)]
+            )
+            (Q): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 10x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 10x16 (cuda:0)]
+            )
+            (B): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 100x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 100x16 (cuda:0)]
+            )
+          )
+          (weights_generator_shared): WeightGenerator(
+            (P): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 16x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 16x16 (cuda:0)]
+            )
+            (B): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 1x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 1x16 (cuda:0)]
+            )
+          )
+          (intra_Linear): Linear(in_features=1, out_features=16, bias=True)
+          (intra_cross_attention): CrossDimensionAttention(
+            (linear_router): Linear(in_features=16, out_features=16, bias=True)
+            (linear_k): Linear(in_features=16, out_features=16, bias=True)
+            (linear_v): Linear(in_features=16, out_features=16, bias=True)
+            (linear_query): Linear(in_features=16, out_features=16, bias=True)
+            (dim_sender): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dim_receiver): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dropout): Dropout(p=0.1, inplace=False)
+            (norm1): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (MLP1): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+            (MLP2): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+          )
+          (emb_linear): Linear(in_features=256, out_features=256, bias=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+          (inter_patch_attention): Inter_Patch_Attention(
+            (W_Q): Linear(in_features=256, out_features=256, bias=True)
+            (W_K): Linear(in_features=256, out_features=256, bias=True)
+            (W_V): Linear(in_features=256, out_features=256, bias=True)
+            (sdp_attn): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=256, out_features=256, bias=True)
+              (1): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (inter_cross_attention): CrossDimensionAttention(
+            (linear_router): Linear(in_features=16, out_features=16, bias=True)
+            (linear_k): Linear(in_features=16, out_features=16, bias=True)
+            (linear_v): Linear(in_features=16, out_features=16, bias=True)
+            (linear_query): Linear(in_features=16, out_features=16, bias=True)
+            (dim_sender): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dim_receiver): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dropout): Dropout(p=0.1, inplace=False)
+            (norm1): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (MLP1): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+            (MLP2): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+          )
+          (final_ffn): Sequential(
+            (0): Linear(in_features=16, out_features=16, bias=True)
+            (1): GELU(approximate='none')
+            (2): Dropout(p=0.1, inplace=False)
+            (3): Linear(in_features=16, out_features=16, bias=True)
+          )
+        )
+        (1): QuadraLayer(
+          (embedding_generator_shared): Sequential(
+            (0): Linear(in_features=16, out_features=16, bias=True)
+          )
+          (intra_patch_attention): Intra_Patch_Attention(
+            (custom_linear): CustomLinear()
+          )
+          (weights_generator_distinct): WeightGenerator(
+            (generator): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): Tanh()
+              (2): Linear(in_features=64, out_features=64, bias=True)
+              (3): Tanh()
+              (4): Linear(in_features=64, out_features=100, bias=True)
+            )
+            (P): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 16x10 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 16x10 (cuda:0)]
+            )
+            (Q): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 10x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 10x16 (cuda:0)]
+            )
+            (B): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 100x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 100x16 (cuda:0)]
+            )
+          )
+          (weights_generator_shared): WeightGenerator(
+            (P): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 16x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 16x16 (cuda:0)]
+            )
+            (B): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 1x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 1x16 (cuda:0)]
+            )
+          )
+          (intra_Linear): Linear(in_features=2, out_features=16, bias=True)
+          (intra_cross_attention): CrossDimensionAttention(
+            (linear_router): Linear(in_features=16, out_features=16, bias=True)
+            (linear_k): Linear(in_features=16, out_features=16, bias=True)
+            (linear_v): Linear(in_features=16, out_features=16, bias=True)
+            (linear_query): Linear(in_features=16, out_features=16, bias=True)
+            (dim_sender): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dim_receiver): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dropout): Dropout(p=0.1, inplace=False)
+            (norm1): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (MLP1): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+            (MLP2): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+          )
+          (emb_linear): Linear(in_features=128, out_features=128, bias=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+          (inter_patch_attention): Inter_Patch_Attention(
+            (W_Q): Linear(in_features=128, out_features=128, bias=True)
+            (W_K): Linear(in_features=128, out_features=128, bias=True)
+            (W_V): Linear(in_features=128, out_features=128, bias=True)
+            (sdp_attn): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=128, out_features=128, bias=True)
+              (1): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (inter_cross_attention): CrossDimensionAttention(
+            (linear_router): Linear(in_features=16, out_features=16, bias=True)
+            (linear_k): Linear(in_features=16, out_features=16, bias=True)
+            (linear_v): Linear(in_features=16, out_features=16, bias=True)
+            (linear_query): Linear(in_features=16, out_features=16, bias=True)
+            (dim_sender): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dim_receiver): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dropout): Dropout(p=0.1, inplace=False)
+            (norm1): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (MLP1): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+            (MLP2): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+          )
+          (final_ffn): Sequential(
+            (0): Linear(in_features=16, out_features=16, bias=True)
+            (1): GELU(approximate='none')
+            (2): Dropout(p=0.1, inplace=False)
+            (3): Linear(in_features=16, out_features=16, bias=True)
+          )
+        )
+        (2): QuadraLayer(
+          (embedding_generator_shared): Sequential(
+            (0): Linear(in_features=16, out_features=16, bias=True)
+          )
+          (intra_patch_attention): Intra_Patch_Attention(
+            (custom_linear): CustomLinear()
+          )
+          (weights_generator_distinct): WeightGenerator(
+            (generator): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): Tanh()
+              (2): Linear(in_features=64, out_features=64, bias=True)
+              (3): Tanh()
+              (4): Linear(in_features=64, out_features=100, bias=True)
+            )
+            (P): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 16x10 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 16x10 (cuda:0)]
+            )
+            (Q): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 10x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 10x16 (cuda:0)]
+            )
+            (B): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 100x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 100x16 (cuda:0)]
+            )
+          )
+          (weights_generator_shared): WeightGenerator(
+            (P): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 16x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 16x16 (cuda:0)]
+            )
+            (B): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 1x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 1x16 (cuda:0)]
+            )
+          )
+          (intra_Linear): Linear(in_features=4, out_features=16, bias=True)
+          (intra_cross_attention): CrossDimensionAttention(
+            (linear_router): Linear(in_features=16, out_features=16, bias=True)
+            (linear_k): Linear(in_features=16, out_features=16, bias=True)
+            (linear_v): Linear(in_features=16, out_features=16, bias=True)
+            (linear_query): Linear(in_features=16, out_features=16, bias=True)
+            (dim_sender): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dim_receiver): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dropout): Dropout(p=0.1, inplace=False)
+            (norm1): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (MLP1): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+            (MLP2): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+          )
+          (emb_linear): Linear(in_features=64, out_features=64, bias=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+          (inter_patch_attention): Inter_Patch_Attention(
+            (W_Q): Linear(in_features=64, out_features=64, bias=True)
+            (W_K): Linear(in_features=64, out_features=64, bias=True)
+            (W_V): Linear(in_features=64, out_features=64, bias=True)
+            (sdp_attn): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=64, out_features=64, bias=True)
+              (1): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (inter_cross_attention): CrossDimensionAttention(
+            (linear_router): Linear(in_features=16, out_features=16, bias=True)
+            (linear_k): Linear(in_features=16, out_features=16, bias=True)
+            (linear_v): Linear(in_features=16, out_features=16, bias=True)
+            (linear_query): Linear(in_features=16, out_features=16, bias=True)
+            (dim_sender): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dim_receiver): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dropout): Dropout(p=0.1, inplace=False)
+            (norm1): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (MLP1): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+            (MLP2): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+          )
+          (final_ffn): Sequential(
+            (0): Linear(in_features=16, out_features=16, bias=True)
+            (1): GELU(approximate='none')
+            (2): Dropout(p=0.1, inplace=False)
+            (3): Linear(in_features=16, out_features=16, bias=True)
+          )
+        )
+        (3): QuadraLayer(
+          (embedding_generator_shared): Sequential(
+            (0): Linear(in_features=16, out_features=16, bias=True)
+          )
+          (intra_patch_attention): Intra_Patch_Attention(
+            (custom_linear): CustomLinear()
+          )
+          (weights_generator_distinct): WeightGenerator(
+            (generator): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): Tanh()
+              (2): Linear(in_features=64, out_features=64, bias=True)
+              (3): Tanh()
+              (4): Linear(in_features=64, out_features=100, bias=True)
+            )
+            (P): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 16x10 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 16x10 (cuda:0)]
+            )
+            (Q): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 10x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 10x16 (cuda:0)]
+            )
+            (B): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 100x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 100x16 (cuda:0)]
+            )
+          )
+          (weights_generator_shared): WeightGenerator(
+            (P): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 16x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 16x16 (cuda:0)]
+            )
+            (B): ParameterList(
+                (0): Parameter containing: [torch.float32 of size 1x16 (cuda:0)]
+                (1): Parameter containing: [torch.float32 of size 1x16 (cuda:0)]
+            )
+          )
+          (intra_Linear): Linear(in_features=8, out_features=16, bias=True)
+          (intra_cross_attention): CrossDimensionAttention(
+            (linear_router): Linear(in_features=16, out_features=16, bias=True)
+            (linear_k): Linear(in_features=16, out_features=16, bias=True)
+            (linear_v): Linear(in_features=16, out_features=16, bias=True)
+            (linear_query): Linear(in_features=16, out_features=16, bias=True)
+            (dim_sender): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dim_receiver): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dropout): Dropout(p=0.1, inplace=False)
+            (norm1): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (MLP1): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+            (MLP2): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+          )
+          (emb_linear): Linear(in_features=32, out_features=32, bias=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+          (inter_patch_attention): Inter_Patch_Attention(
+            (W_Q): Linear(in_features=32, out_features=32, bias=True)
+            (W_K): Linear(in_features=32, out_features=32, bias=True)
+            (W_V): Linear(in_features=32, out_features=32, bias=True)
+            (sdp_attn): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=32, out_features=32, bias=True)
+              (1): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (inter_cross_attention): CrossDimensionAttention(
+            (linear_router): Linear(in_features=16, out_features=16, bias=True)
+            (linear_k): Linear(in_features=16, out_features=16, bias=True)
+            (linear_v): Linear(in_features=16, out_features=16, bias=True)
+            (linear_query): Linear(in_features=16, out_features=16, bias=True)
+            (dim_sender): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dim_receiver): SparseScaledDotProductAttention(
+              (attn_dropout): Dropout(p=0.1, inplace=False)
+            )
+            (dropout): Dropout(p=0.1, inplace=False)
+            (norm1): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (norm3): LayerNorm((16,), eps=1e-05, elementwise_affine=True)
+            (MLP1): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+            (MLP2): Sequential(
+              (0): Linear(in_features=16, out_features=64, bias=True)
+              (1): GELU(approximate='none')
+              (2): Linear(in_features=64, out_features=16, bias=True)
+            )
+          )
+          (final_ffn): Sequential(
+            (0): Linear(in_features=16, out_features=16, bias=True)
+            (1): GELU(approximate='none')
+            (2): Dropout(p=0.1, inplace=False)
+            (3): Linear(in_features=16, out_features=16, bias=True)
+          )
+        )
+      )
+      (w_noise): Linear(in_features=16, out_features=4, bias=True)
+      (w_gate): Linear(in_features=16, out_features=4, bias=True)
+      (end_MLP): MLP(
+        (fc): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+      )
+      (softplus): Softplus(beta=1.0, threshold=20.0)
+      (softmax): Softmax(dim=1)
+      (extractors): ModuleList(
+        (0-3): 4 x LearnableDilationExpert(
+          (dw): Conv1d(303, 303, kernel_size=(3,), stride=(1,), padding=(1,), groups=303)
+          (pw): Conv1d(303, 303, kernel_size=(1,), stride=(1,))
+          (gn): GroupNorm(1, 303, eps=1e-05, affine=True)
+        )
+      )
+    )
+  )
+  (projections): Sequential(
+    (0): Linear(in_features=256, out_features=16, bias=True)
+  )
+)
+2026-05-20 15:41:28,046 - INFO - 
+=== Training Dev Information ===
+2026-05-20 15:41:28,047 - INFO - Choose Dev: cuda
+2026-05-20 15:41:28,047 - INFO - Current CUDA Dev: NVIDIA GeForce GTX 1080 Ti
