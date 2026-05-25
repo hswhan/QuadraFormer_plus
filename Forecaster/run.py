@@ -160,7 +160,7 @@ class Forecaster:
                 super().__init__()
                 self.eps = eps
             def forward(self, pred, target):
-                return torch.mean(torch.sqrt((pred - target) ** 2 + self.eps))
+                return torch.mean(torch.sqrt((pred - target) ** 2 + self.eps ** 2))
         criterion = CharbonnierLoss(eps=1e-6)
         save_dir = "saved_models"
         os.makedirs(save_dir, exist_ok=True)
@@ -316,14 +316,14 @@ class Forecaster:
                 all_outputs.append(outputs)
                 all_targets.append(batch_y)
         preds = torch.cat(all_outputs, dim=0).cpu()  # (N , H , D)
-        preds = torch.nan_to_num(preds, nan=0.0, posinf=1e6, neginf=-1e6)  # ✅ 防护
+        preds = torch.nan_to_num(preds, nan=0.0, posinf=1e6, neginf=-1e6)  
         targets = torch.cat(all_targets, dim=0).cpu()
         if self.config["QPS"] != "True":
             metrics = calculate_metrics(preds, targets,
                                     self.config,
                                     dict_df,
                                     column_labels,
-                                    getattr(self, "scaler", None),  # 若有 scaler 就用
+                                    getattr(self, "scaler", None),  
                                     self.test_max,
                                     self.test_min,
                                     )
