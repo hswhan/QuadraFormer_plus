@@ -53,9 +53,9 @@ config = {
     "less": "Flase",
     "QPS": "Flase",
 
-    "window_size": 32,
-    "prediction_length": 32,
-    "batch_size": 16,
+    "window_size": 16,
+    "prediction_length": 16,
+    "batch_size": 64,
 
     "learning_rate": 2e-4,
     "early_stopping": 1e-3,
