@@ -25,7 +25,7 @@ class AMS_new(nn.Module):
                  residual_connection=1,
                  batch_norm=False,
                  adaptive_d_min: int = 1,
-                 adaptive_d_max: int = 1,
+                 adaptive_d_max: int = 16,
                  adaptive_kernel_size: int = 3,
                  adaptive_use_dilated_conv: bool = True,
                  lambda_diverse: float = 1e-3,
